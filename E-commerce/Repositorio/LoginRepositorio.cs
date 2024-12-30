@@ -1,30 +1,25 @@
 ﻿using Ecommerce.Data;
 using E_commerce.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using Refit;
 
 namespace E_commerce.Repositorio
 {
 	public class LoginRepositorio : ILoginRepositorio
 	{
 		private readonly BancoContext _bancoContext;
+        private readonly ILoginAPI _loginApiClient;
 
-		public LoginRepositorio(BancoContext bancoContext)
+        public LoginRepositorio(BancoContext bancoContext, ILoginAPI IloginAPI)
 		{
 			_bancoContext = bancoContext;
-		}
-		public LoginModel Adicionar(LoginModel login)
-		{
-			login.SetPasswordHash();
-			login.CreatedDate = DateTime.Now;
-			login.UpdateDate = DateTime.Now;
-			_bancoContext.Login.Add(login);
-			_bancoContext.SaveChanges();
-
-			return login;
-		}
+            _loginApiClient = IloginAPI;
+        }
 		public LoginModel ListarPorUser(SignInModel signIn)
 		{
-			return _bancoContext.Login.FirstOrDefault(x => x.User == signIn.User);
+			return _bancoContext.Login.FirstOrDefault(x => x.UserName == signIn.User);
 		}
 
 		public bool isValidLogin(SignInModel signIn)
@@ -35,7 +30,7 @@ namespace E_commerce.Repositorio
 
 			signIn.SetPasswordHash();
 
-			if (loginModel.User == signIn.User && loginModel.Password==signIn.Password)
+			if (loginModel.UserName == signIn.User && loginModel.Password==signIn.Password)
 			{
 				isValid = true;
 			}
@@ -63,5 +58,20 @@ namespace E_commerce.Repositorio
 
 			return isValid;
 		}
-	}
+
+        public async Task<ResponseModel> Adicionar(LoginModel login)
+        {
+            try
+            {
+                return await _loginApiClient.Adicionar(login);
+            }
+            catch (Exception ex)
+            {
+                // Log do erro
+                Console.WriteLine($"Erro ao adicionar login: {ex.Message}");
+                throw;
+            }
+        }
+
+    }
 }

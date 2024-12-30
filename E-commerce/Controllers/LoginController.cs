@@ -2,6 +2,8 @@
 using E_commerce.Repositorio;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Refit;
+
 
 namespace E_commerce.Controllers
 {
@@ -36,9 +38,7 @@ namespace E_commerce.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				_loginRepositorio.Adicionar(login);
-				TempData["MensagemSucesso"] = "Usuário cadastrado com sucesso";
-				return RedirectToAction("SignIn");
+				var response= _loginRepositorio.Adicionar(login);
 			}
 
 			return View(login);

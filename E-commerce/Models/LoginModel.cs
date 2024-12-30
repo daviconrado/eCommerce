@@ -1,27 +1,27 @@
 ﻿using E_commerce.Helper;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 
 namespace E_commerce.Models
 {
-	public class LoginModel
+	public class LoginModel : IdentityUser
 	{
-		public int Id {  get; set; }
-		[Required]
-		[StringLength(100)]
-		public string User {  get; set; }
-		[Required]
-		[EmailAddress]
-		public string Email { get; set; }
-		[Required]
-
-		public string Password { get; set; }
-
-		public DateTime CreatedDate { get; set; }
-		public DateTime UpdateDate { get; set; }
-
-		public void SetPasswordHash()
+		[JsonPropertyName("user")]
+		public new string UserName
 		{
-			Password = Password.GerarHash();
+			get => base.UserName;
+			set => base.UserName = value;
 		}
+
+		[JsonPropertyName("email")]
+		public new string Email
+		{
+			get => base.Email;
+			set => base.Email = value;
+		}
+
+		[JsonPropertyName("password")]
+		public string Password { get; set; }
 	}
 }
